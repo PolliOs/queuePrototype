@@ -1,0 +1,20 @@
+option java_generic_services = true;
+
+message MessageResult {
+  optional int32 message = 1;
+}
+message RequestMessage{
+  optional int32 numberA=1;
+  optional int32 numberB=2;
+  optional int64 startTime=3;
+}
+
+message Void {
+}
+
+service AddService {
+  rpc add(RequestMessage) returns (MessageResult);
+}
+service SubtractionService {
+  rpc subtract(RequestMessage) returns (MessageResult);
+}

@@ -58,7 +58,11 @@ public class WordCountMaster {
         for (int i=0; i<numberOfWords; i++) {
             words += Integer.toString(random.nextInt(670)) + " ";
         }
-
+        if(random.nextInt(2) == 0){
+            words += "+ ";
+        }else{
+            words += "- ";
+        }
         return words;
     }
 
@@ -90,7 +94,7 @@ public class WordCountMaster {
             if(i != numberOfRequests-1) {
                  document = MessageString.newBuilder().setMessage(randomWords() + " " + System.currentTimeMillis()).build();
             } else{
-                document=MessageString.newBuilder().setMessage("0 0" + " " + System.currentTimeMillis()).build();
+                document=MessageString.newBuilder().setMessage("0 0 + " + " " + System.currentTimeMillis()).build();
             }
            // System.out.println("Sending numbers: " + document);
             // Send word count task evenly distributed to worker nodes
