@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.zeromq.ZMQ;
 
-import rpc.RpcServer;
 import utils.Utils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -14,7 +13,6 @@ import com.google.protobuf.Message;
 import com.google.protobuf.RpcCallback;
 import com.google.protobuf.Service;
 import com.google.protobuf.Descriptors.MethodDescriptor;
-import com.google.protobuf.Descriptors.ServiceDescriptor;
 
 /**
  * The base abstract class Listener that implements the server-side of Google Protobuf service scaffolding contract
@@ -26,7 +24,7 @@ public abstract class Listener {
     /**
      * Map of the service method signatures and their corresponding compact binary op-code
      */
-    protected Map<Long, RequestMessage> rpcMethodMap = new HashMap<Long, RequestMessage>();
+    protected Map<Long, RequestMessage> rpcMethodMap = new HashMap<>();
 
     protected ZMQ.Context zmqContext;
     protected ZMQ.Socket zmqSocket;
@@ -34,7 +32,7 @@ public abstract class Listener {
     /**
      * Synchronization object used to ensure that zeromq socket object's recv() and send() methods are synchronized
      */
-    protected Boolean socketBlock = new Boolean(false);
+    protected final Boolean socketBlock = Boolean.FALSE;
 
     /**
      * hook for children class to initialize the zeromq socket to a specific type (e.g., RPC, pub-sub, push-pull)
@@ -123,12 +121,7 @@ public abstract class Listener {
     public void startThread() {
         final Listener self = this;
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                self.start();
-            }
-        };
+        Runnable runnable = self::start;
 
         Thread processMsg = new Thread(runnable);
         processMsg.start();

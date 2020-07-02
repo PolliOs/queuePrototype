@@ -12,9 +12,7 @@ message RequestMessage{
 message Void {
 }
 
-service AddService {
+service CalcService {
   rpc add(RequestMessage) returns (MessageResult);
-}
-service SubtractionService {
   rpc subtract(RequestMessage) returns (MessageResult);
 }

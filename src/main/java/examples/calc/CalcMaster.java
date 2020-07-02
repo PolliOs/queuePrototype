@@ -1,17 +1,10 @@
 package examples.calc;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import messaging.QueueCalc.CalcService;
+import messaging.QueueCalc.RequestMessage;
 import taskqueue.Master;
 
-import com.google.protobuf.RpcCallback;
-import messaging.QueueCalc.AddService;
-import messaging.QueueCalc.SubtractionService;
-import messaging.QueueCalc.RequestMessage;
-import messaging.QueueCalc.MessageResult;
-
-import static java.util.Collections.sort;
+import java.util.*;
 
 /**
  * Word Counter example to demonstrate task-queue, a WordCountMaster that submit tasks in form
@@ -28,21 +21,19 @@ public class CalcMaster {
 
     public static void main(String[] args) throws InterruptedException {
 
-        Set<CalcWorker> calcWorkers = new HashSet<CalcWorker>();
-        Map<String,ArrayList< Double>> measureTimeMap  = new HashMap<String, ArrayList<Double>>();
+        Set<CalcWorker> calcWorkers = new HashSet<>();
+        Map<String,ArrayList< Double>> measureTimeMap  = new HashMap<>();
 
         for (int i=0;i<3;i++) {
-            calcWorkers.add(new CalcWorker("127.0.0.1", 5555, "127.0.0.1", 5556, 1, i,measureTimeMap));
+            calcWorkers.add(new CalcWorker("127.0.0.1", 5555, "127.0.0.1", 5556+i, 1, i,measureTimeMap));
         }
 
         // Wait for 0.5 seconds to sync up initially the CalcWorker nodes binding to the CalcMaster node
         // TO-DO: Have better synchronization amongst worker and master nodes instead of wait
         Thread.sleep(500);
 
-        // Set up the CalcMaster AddService scaffolding
-        AddService addService =  AddService.newStub(new Master("127.0.0.1", 5555,
-                "127.0.0.1", 5556, 1));
-        SubtractionService subtractionServiceService =  SubtractionService.newStub(new Master("127.0.0.1", 5555,
+        // Set up the CalcMaster CalcService scaffolding
+        CalcService calcService =  CalcService.newStub(new Master("127.0.0.1", 5555,
                 "127.0.0.1", 5556, 1));
 
         int numberOfRequests = 1001;
@@ -53,13 +44,12 @@ public class CalcMaster {
             } else{
                 requestMessage = RequestMessage.newBuilder().setNumberA(0).setNumberB(0).setStartTime(System.currentTimeMillis()).build();
             }
-            addService.add(null, requestMessage, new RpcCallback<MessageResult>() {
-                @Override
-                public void run(MessageResult msg) {
-                    int result = msg.getMessage();
-                    // System.out.println("Current result: " + result);
-                }
-            });
+            if(i%2==0) {
+                calcService.add(null, requestMessage, msg -> {});
+            }else{
+                calcService.subtract(null, requestMessage, msg -> {});
+
+            }
         }
 
 
